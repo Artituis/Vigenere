@@ -32,6 +32,7 @@ public final class Decriptor {
 
     public static double indexOfCoincidence(String text) {
         int[] counts = new int[26];
+        // Conta cada letra
         for (int i = 0; i < text.length(); i++) {
             counts[text.charAt(i) - 'A']++;
         }
@@ -66,6 +67,7 @@ public final class Decriptor {
     // otherwise be indistinguishable from the real answer.
     public static int estimateKeyLength(String cipherText, int maxLength) {
         Map<Integer, Double> averages = evaluateKeyLengths(cipherText, maxLength);
+        // Deixa apenas as médias que não são muito aleatórias
         for (Map.Entry<Integer, Double> entry : averages.entrySet()) {
             if (entry.getValue() > KEY_LENGTH_THRESHOLD) {
                 return entry.getKey();
@@ -82,12 +84,14 @@ public final class Decriptor {
         return bestLength;
     }
 
+    // Agrega todas as letras que estão no modulo da chave
     private static String[] splitIntoSubtexts(String cipherText, int keyLength) {
         StringBuilder[] builders = new StringBuilder[keyLength];
         for (int i = 0; i < keyLength; i++) {
             builders[i] = new StringBuilder();
         }
         for (int i = 0; i < cipherText.length(); i++) {
+            // Modulo do tamanho da chave
             builders[i % keyLength].append(cipherText.charAt(i));
         }
         String[] subtexts = new String[keyLength];
@@ -113,6 +117,7 @@ public final class Decriptor {
 
     private static int bestShiftForSubtext(String subtext) {
         int[] counts = new int[26];
+        //Conta quantas letras em cada subtext
         for (int i = 0; i < subtext.length(); i++) {
             counts[subtext.charAt(i) - 'A']++;
         }
@@ -131,6 +136,7 @@ public final class Decriptor {
     // Blind attack entry point: estimates the key length from the IC table, then the shift of
     // each key position via chi-squared frequency analysis, without ever being told the key.
     public static String decriptKey(String message) {
+        // Procura pelo tamanho da chave até 10
         int keyLength = estimateKeyLength(message, 10);
         String[] subtexts = splitIntoSubtexts(message, keyLength);
         StringBuilder key = new StringBuilder();
