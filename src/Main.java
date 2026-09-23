@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Normalizer;
+import java.util.Scanner;
 
 
 public class Main {
@@ -10,7 +11,12 @@ public class Main {
         Path inputFile = Path.of("input.txt");
         Path encodedFile = Path.of("encoded.txt");
         Path outputFile = Path.of("output.txt");
-        String key = "segredo";
+        String key = "wab";
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the Vigenère key: ");
+        key = scanner.nextLine().trim().toLowerCase();
         try {
             // Read the entire file into a String
             String content = Files.readString(inputFile);
