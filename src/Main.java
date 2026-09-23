@@ -2,7 +2,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
+import java.text.Normalizer;
+import java.util.Scanner;
 
 
 public class Main {
@@ -10,18 +11,27 @@ public class Main {
         Path inputFile = Path.of("input.txt");
         Path encodedFile = Path.of("encoded.txt");
         Path outputFile = Path.of("output.txt");
-        String key = "secret";
+        String key = "wab";
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the Vigenère key: ");
+        key = scanner.nextLine().trim().toLowerCase();
         try {
             // Read the entire file into a String
             String content = Files.readString(inputFile);
-            content = content.replaceAll("[^a-zA-Z]", "");
-            // Print the content
-            //System.out.println(content);
+            content = content.toLowerCase();
+            content = Normalizer.normalize(content, Normalizer.Form.NFD);          // á -> "a" + separate accent mark
+            content = content.replaceAll("\\p{InCombiningDiacriticalMarks}+", ""); // strip the accent mark, keep "a"
+            content = content.replaceAll("[^a-z]", "");                           // remove anything that isn't a letter
 
             String encoded = Vigenere.encode(content, key);
             Files.writeString(encodedFile, encoded);
-            System.out.println("Key is: " + Decriptor.decriptKey(encoded));
-            String decoded = Vigenere.decode(encoded, key);
+
+            // Blind attack: the real key is never passed to Decriptor, only the ciphertext.
+            String guessedKey = Decriptor.decriptKey(encoded);
+            System.out.println("Key is: " + guessedKey);
+            String decoded = Vigenere.decode(encoded, guessedKey);
 
             // Save the content to the output file
             Files.writeString(outputFile, decoded);
